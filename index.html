@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Digital Art Gallery</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- FontAwesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+<style>
+/* Reset */
+* {
+  margin: 0; padding: 0; box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  line-height: 1.6;
+  background: #f9f9f9;
+  color: #333;
+}
+
+/* Sticky Navbar */
+nav {
+  position: sticky;
+  top: 0;
+  background: #111;
+  color: white;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 15px 0;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.3s;
+}
+
+nav a:hover,
+nav a:focus {
+  color: #FFD700;
+  outline: none;
+}
+
+/* Header */
+header {
+  background: #111;
+  color: #fff;
+  text-align: center;
+  padding: 70px 20px 50px;
+  animation: fadeInDown 1s ease forwards;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+header p {
+  font-size: 1.3rem;
+  color: #ddd;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Sections Common */
+section {
+  padding: 50px 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* About Us */
+.about-us {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.circular-image {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: url('https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?auto=format&fit=crop&w=400&q=80') center/cover no-repeat;
+  flex-shrink: 0;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.5s ease, filter 0.5s ease;
+  filter: brightness(0.85);
+}
+
+.circular-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.2);
+  transition: background 0.5s ease;
+}
+
+.circular-image:hover {
+  transform: scale(1.1);
+  filter: brightness(1);
+}
+
+.circular-image:hover::after {
+  background: rgba(0,0,0,0);
+}
+
+.about-text {
+  flex: 1;
+  min-width: 280px;
+  line-height: 1.5;
+  color: #222;
+}
+
+/* Features */
+.features {
+  text-align: center;
+}
+
+.features p {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  color: #555;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+  gap: 30px;
+}
+
+.grid-container figure {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  cursor: pointer;
+  background: white;
+  transition: transform 0.3s ease;
+}
+
+.grid-container figure:hover {
+  transform: scale(1.05);
+}
+
+.grid-container img {
+  width: 100%;
+  display: block;
+  border-radius: 12px 12px 0 0;
+}
+
+.grid-container figcaption {
+  padding: 15px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  background: #fff;
+  color: #111;
+}
+
+/* Alt Section */
+.alt-section {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-top: 50px;
+}
+
+/* --- TOOLTIP STYLES (ADDED) --- */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  outline: none;
+}
+
+/* ensure wrapped images keep existing style */
+.tooltip-container img {
+  width: 320px; /* keep same as original .alt-section img */
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+  display: block;
+}
+
+/* image hover zoom (preserve original behavior) */
+.tooltip-container:hover img {
+  transform: scale(1.05);
+}
+
+/* tooltip bubble */
+.tooltip-container::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: rgba(0,0,0,0.88);
+  color: #fff;
+  padding: 12px 14px;
+  border-radius: 8px;
+  white-space: normal;
+  width: 320px;
+  max-width: calc(100vw - 40px);
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 1200;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+/* tooltip arrow */
+.tooltip-container::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  border-width: 7px;
+  border-style: solid;
+  border-color: transparent transparent rgba(0,0,0,0.88) transparent;
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  z-index: 1200;
+}
+
+/* show on hover, focus (keyboard) or .show-tooltip (touch toggle) */
+.tooltip-container:hover::after,
+.tooltip-container:focus::after,
+.tooltip-container.show-tooltip::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.tooltip-container:hover::before,
+.tooltip-container:focus::before,
+.tooltip-container.show-tooltip::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* responsive adjust */
+@media (max-width: 600px) {
+  .tooltip-container img {
+    width: 100%;
+  }
+  .tooltip-container::after {
+    width: calc(100vw - 40px);
+    font-size: 13px;
+  }
+}
+
+/* end tooltip */
+
+/* continue existing CSS */
+.alt-section img {
+  /* kept but overridden by .tooltip-container img where wrapped */
+}
+
+.alt-section img:hover {
+  transform: scale(1.05);
+}
+
+.alt-section div {
+  flex: 1;
+  min-width: 300px;
+}
+
+.reverse {
+  flex-direction: row-reverse;
+}
+
+/* Team */
+.team-section {
+  text-align: center;
+}
+
+.team-section h3 {
+  margin-bottom: 25px;
+  font-weight: 600;
+  color: #444;
+}
+
+.profile-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+}
+
+.profile-grid > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 150px;
+}
+
+.profile-grid img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.profile-grid img:hover {
+  transform: scale(1.1);
+}
+
+.profile-grid p {
+  margin-top: 12px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Support Packages */
+.pricing-section {
+  text-align: center;
+}
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.card {
+  background: #FFD700;
+  padding: 25px 20px;
+  border-radius: 15px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  width: 320px;
+  text-align: left;
+  transition: box-shadow 0.3s ease;
+  position: relative;
+}
+
+.card:hover {
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+}
+
+.card h2 {
+  margin-bottom: 15px;
+}
+
+.card ul {
+  padding-left: 20px;
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.support-btn {
+  display: inline-block;
+  margin-top: 20px;
+  background: #111;
+  color: #FFD700;
+  padding: 10px 25px;
+  border-radius: 30px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.support-btn:hover,
+.support-btn:focus {
+  background: #f5d23b;
+  color: #111;
+  outline: none;
+}
+
+/* FAQ Section with Accordion */
+.faq-section {
+  max-width: 850px;
+  margin: 50px auto;
+  padding: 0 20px;
+}
+
+.faq-section h2 {
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.faq-section h3 {
+  text-align: center;
+  color: #666;
+  margin-bottom: 40px;
+  font-weight: 400;
+}
+
+.faq-item {
+  border-bottom: 1px solid #ccc;
+  padding: 15px 0;
+}
+
+.faq-question {
+  cursor: pointer;
+  font-weight: 600;
+  position: relative;
+  padding-right: 25px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+}
+
+.faq-question::after {
+  content: "\f107"; /* FontAwesome chevron down */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: transform 0.3s ease;
+}
+
+.faq-question.active::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  padding-left: 10px;
+  color: #444;
+  margin-top: 5px;
+}
+
+/* Contact Section */
+.contact-section {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 50px 20px;
+  max-width: 1100px;
+  margin: auto;
+}
+
+.contact-info {
+  max-width: 450px;
+}
+
+.contact-info p {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.contact-map img {
+  width: 400px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+/* Footer */
+footer {
+  background: #111;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 0.9rem;
+}
+
+footer div a {
+  color: white;
+  margin-right: 15px;
+  font-size: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+footer div a:last-child {
+  margin-right: 0;
+}
+
+footer div a:hover,
+footer div a:focus {
+  color: #FFD700;
+  outline: none;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .about-us, .alt-section {
+    flex-direction: column;
+  }
+  .alt-section.reverse {
+    flex-direction: column;
+  }
+  .contact-section {
+    flex-direction: column;
+  }
+  nav {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 450px) {
+  header h1 {
+    font-size: 1.8rem;
+  }
+  header p {
+    font-size: 1rem;
+  }
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+  .card-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .card {
+    width: 90%;
+  }
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav role="navigation" aria-label="Main navigation">
+  <a href="#about">About Us</a>
+  <a href="#features">Features</a>
+  <a href="#awareness">Awareness</a>
+  <a href="#interactive">Interactive</a>
+  <a href="#team">Team</a>
+  <a href="#support">Support</a>
+  <a href="#faq">FAQ</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<header>
+  <h1>To change the world, you must first see it.</h1>
+  <p>Welcome — this gallery will take you on a different journey.</p>
+</header>
+
+<!-- About Us -->
+<section id="about" class="about-us">
+  <div class="circular-image" role="img" aria-label="Gallery symbolic image"></div>
+  <div class="about-text">
+    <h2>About Us</h2>
+    <p>This digital gallery is designed to help you see global issues in a multi-dimensional and accessible way. Our goal is to create awareness and inspire thought through the power of art.</p>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features" class="features" tabindex="-1" aria-labelledby="features-title">
+  <h2 id="features-title">Gallery Features</h2>
+  <p>Explore the unique aspects of our gallery.</p>
+  <div class="grid-container">
+    <figure tabindex="0" data-title="Interactive AI Guide" aria-label="Interactive AI Guide">
+      <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=600&q=80" alt="AI guide interacting with user" loading="lazy" />
+      <figcaption>Interactive AI Guide</figcaption>
+    </figure>
+    <figure tabindex="0" data-title="Global Art Exhibits" aria-label="Global Art Exhibits">
+      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Global art exhibit" loading="lazy" />
+      <figcaption>Global Art Exhibits</figcaption>
+    </figure>
+    <figure tabindex="0" data-title="Sustainable Art Practices" aria-label="Sustainable Art Practices">
+      <img src="https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=600&q=80" alt="Sustainable art creation" loading="lazy" />
+      <figcaption>Sustainable Art Practices</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- Awareness Through Art -->
+<section id="awareness" class="alt-section" tabindex="0">
+  <div class="tooltip-container" tabindex="0"
+       data-tooltip="Dr. Gachet'nin Portresi Hollandalı ressam Vincent van Gogh'un en çok değer gören resimlerinden birisidir. Hayatının son zamanlarında tedavi gördüğü Dr. Paul Gachet'nin portresidir. Haziran 1890 tarihinde yapılmış tablonun doğrulanmış iki versiyonu vardır. Her ikisinde de Dr. Gachet masaya oturmuş, başını sağ eline yaslamış pozisyondadır. Tablo 1897 yılında 300 franka (günümüzde 57,85 ABD doları) satılmıştır. 1990 yılında bu resim 82,5 milyon dolarlık rekor bir bedele satılmıştır.">
+    <img src="https://cdn.quicksigorta.com/qblog/content/9e/66/65/content-1284-9e66651f-4718-4bc7-8d75-60c8d2464a50_960x720.jpg" alt="Art for Awareness" />
+  </div>
+
+  <div>
+    <h2>Awareness Through Art</h2>
+    <p>Each image tells a global problem through the language of art. Art is one of the most powerful universal languages in the world. In this section, global issues are brought to life through art in a multi-dimensional way. Each piece is specially selected to raise awareness of environmental, social, and economic crises. Visitors don’t just observe the issues with the creative power of art; they also touch, feel, and interpret them. Artworks contribute to the awareness process by presenting complex problems with simple and striking visuals. This experience not only provides information but also encourages action by establishing an emotional connection.</p>
+  </div>
+</section>
+
+<!-- Interactive Experience -->
+<section id="interactive" class="alt-section reverse" tabindex="0">
+  <div class="tooltip-container" tabindex="0"
+       data-tooltip="Edvard Munch’un Çığlık tablosu, yoğun korku ve kaygıyı simgeleyen bir figürü gösterir. Dalgalı gökyüzü ve çarpıcı renkler, duygusal bir fırtınayı yansıtır. Modern sanatın en tanınan eserlerinden biridir.">
+    <img src="https://ivasanat.com/blog/wp-content/uploads/2024/11/ciglik-tablosu.webp" alt="Interactive Art Experience" />
+  </div>
+
+  <div>
+    <h2>Interactive Experience</h2>
+    <p>Discover artworks more deeply with AI-powered interaction. With the power of technology, art pieces communicate dynamically with viewers. Thanks to artificial intelligence and interactive designs, visitors can delve into the depths of artworks, explore different perspectives, and form their own interpretations. The interactions in this section turn passive observers into active participants. Users gain a deeper understanding of global issues by directly interacting with the artworks. Additionally, this experience enriches the art journey with personalized feedback and suggestions, enhancing the learning and awareness process.</p>
+  </div>
+</section>
+
+<!-- Your AI Guide & Membership Section -->
+<section class="alt-section" tabindex="0" style="margin-top: 50px;">
+  <img src="https://cdn-icons-png.flaticon.com/512/4712/4712069.png" alt="Friendly AI robot" style="width: 320px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); flex-shrink: 0; transition: transform 0.3s ease; margin-right: 40px;">
+  <div style="flex: 1; min-width: 300px;">
+    <h2>Your AI Guide</h2>
+    <p>Every art piece in our gallery comes with an intelligent AI Guide to accompany you. When you hover your mouse over an artwork, the AI guide provides a brief explanation of the piece's subject and the problem it represents. This allows you to instantly grasp the meaning behind the art.</p>
+    <p>For a deeper interaction, you can click on the artwork to start a conversation with the AI guide. You can ask it questions about the piece, get information on potential solutions, or share your personal thoughts. The AI guide doesn't just provide information; it also guides you on how to take action against these problems.</p>
+  </div>
+</section>
+
+<section class="alt-section reverse" tabindex="0" style="margin-top: 50px;">
+  <img src="https://cdn-icons-png.flaticon.com/512/1995/1995516.png" alt="People collaborating" style="width: 320px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); flex-shrink: 0; transition: transform 0.3s ease; margin-left: 40px;">
+  <div style="flex: 1; min-width: 300px;">
+    <h2>Membership and Access</h2>
+    <p>Our gallery is completely free and open to everyone. The "Curator: Humanity" project was launched with a mission to raise artistic and technological awareness. For this reason, you can access all the artworks, AI guides, and interactive content on our site without any membership or fee. Our goal is to draw attention to global issues and inspire everyone to take action for a better world.</p>
+  </div>
+</section>
+
+<!-- Team -->
+<section id="team" class="team-section" tabindex="0">
+  <h2>Our Team</h2>
+  <h3>Artists and Developers</h3>
+  <div class="profile-grid">
+    <div>
+      <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Ayşe Demir" tabindex="0" />
+      <p>Ayşe Demir</p>
+    </div>
+    <div>
+      <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Mehmet Yılmaz" tabindex="0" />
+      <p>Mehmet Yılmaz</p>
+    </div>
+    <div>
+      <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Elif Kaya" tabindex="0" />
+      <p>Elif Kaya</p>
+    </div>
+    <div>
+      <img src="https://randomuser.me/api/portraits/men/29.jpg" alt="Can Öztürk" tabindex="0" />
+      <p>Can Öztürk</p>
+    </div>
+  </div>
+</section>
+
+<!-- Support Packages -->
+<section id="support" class="pricing-section" tabindex="0">
+  <h2>Support Packages</h2>
+  <div class="card-container">
+    <div class="card" tabindex="0" aria-label="Gold Support Package">
+      <h2>Gold Package</h2>
+      <ul>
+        <li>Priority access to new exhibitions</li>
+        <li>Exclusive AI-guided tours</li>
+        <li>Behind-the-scenes content</li>
+      </ul>
+      <button class="support-btn" aria-label="Select Gold Package">Select</button>
+    </div>
+    <div class="card" tabindex="0" aria-label="Silver Support Package">
+      <h2>Silver Package</h2>
+      <ul>
+        <li>Access to AI guide</li>
+        <li>Monthly newsletters</li>
+        <li>Special event invites</li>
+      </ul>
+      <button class="support-btn" aria-label="Select Silver Package">Select</button>
+    </div>
+    <div class="card" tabindex="0" aria-label="Bronze Support Package">
+      <h2>Bronze Package</h2>
+      <ul>
+        <li>Basic access to the gallery</li>
+        <li>Participation in surveys</li>
+        <li>Recognition on website</li>
+      </ul>
+      <button class="support-btn" aria-label="Select Bronze Package">Select</button>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="faq-section" tabindex="0" aria-labelledby="faq-title">
+  <h2 id="faq-title">Frequently Asked Questions</h2>
+  <h3>Find quick answers to common queries</h3>
+  <div class="faq-item">
+    <button class="faq-question" aria-expanded="false" aria-controls="faq1-answer" id="faq1-question">What is the mission of this gallery?</button>
+    <div class="faq-answer" id="faq1-answer" role="region" aria-labelledby="faq1-question" style="max-height: 0;">
+      <p>Our mission is to raise awareness about global issues through art and technology.</p>
+    </div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-question" aria-expanded="false" aria-controls="faq2-answer" id="faq2-question">Is membership required?</button>
+    <div class="faq-answer" id="faq2-answer" role="region" aria-labelledby="faq2-question" style="max-height: 0;">
+      <p>No, the gallery is completely free and open to all visitors.</p>
+    </div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-question" aria-expanded="false" aria-controls="faq3-answer" id="faq3-question">Can I interact with the AI guide?</button>
+    <div class="faq-answer" id="faq3-answer" role="region" aria-labelledby="faq3-question" style="max-height: 0;">
+      <p>Yes, you can chat with the AI guide to learn more about the artworks and related global issues.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact" class="contact-section" tabindex="0" aria-labelledby="contact-title">
+  <div class="contact-info">
+    <h2 id="contact-title">Contact Us</h2>
+    <p>For more information about our gallery, feel free to reach out.</p>
+    <p>Our address: Aksaray, Kennedy Cad. No:34, 34096 Fatih/İstanbul</p>
+    <p>Our email: digitalsanatgaleri454@gmail.com</p>
+  </div>
+  <div class="contact-map">
+    <img src="https://static.milliyet.com.tr/others/image/harita/istanbul-ili-haritasi.png" alt="Map of Istanbul" />
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div>
+    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+  </div>
+  <p>© 2025 Digital Art Gallery. All rights reserved.</p>
+</footer>
+
+<script>
+// FAQ Accordion
+document.querySelectorAll('.faq-question').forEach(button => {
+  button.addEventListener('click', () => {
+    const expanded = button.getAttribute('aria-expanded') === 'true';
+    button.setAttribute('aria-expanded', !expanded);
+    const answer = document.getElementById(button.getAttribute('aria-controls'));
+    if (!expanded) {
+      answer.style.maxHeight = answer.scrollHeight + "px";
+      button.classList.add('active');
+    } else {
+      answer.style.maxHeight = null;
+      button.classList.remove('active');
+    }
+  });
+});
+
+// Features images Google arama özelliği
+document.querySelectorAll('#features figure').forEach(figure => {
+  figure.style.cursor = 'pointer'; // imleci pointer yap
+  figure.addEventListener('click', () => {
+    const query = figure.getAttribute('data-title');
+    if (query) {
+      const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      window.open(url, '_blank', 'noopener');
+    }
+  });
+});
+
+/* Touch support for tooltips:
+   - On touch devices, tapping a tooltip-container toggles .show-tooltip class.
+   - Tapping elsewhere closes all.
+*/
+(function(){
+  const containers = document.querySelectorAll('.tooltip-container');
+  let isTouch = false;
+
+  function closeAll() {
+    containers.forEach(c => c.classList.remove('show-tooltip'));
+  }
+
+  // detect touch
+  window.addEventListener('touchstart', function onFirstTouch() {
+    isTouch = true;
+    window.removeEventListener('touchstart', onFirstTouch);
+  }, {passive: true});
+
+  containers.forEach(c => {
+    c.addEventListener('click', (e) => {
+      if (!isTouch) return; // only intercept on touch devices
+      // toggle this one
+      const showing = c.classList.contains('show-tooltip');
+      closeAll();
+      if (!showing) {
+        c.classList.add('show-tooltip');
+        // auto-hide after 4s
+        setTimeout(()=> c.classList.remove('show-tooltip'), 4000);
+      }
+      // prevent further propagation so page doesn't treat as normal click
+      e.stopPropagation();
+    });
+  });
+
+  // close on body touch/click
+  document.body.addEventListener('click', () => {
+    if (isTouch) closeAll();
+  }, {passive: true});
+})();
+</script>
+
+</body>
+</html>
